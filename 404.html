@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>St Helens</title>
+<link rel="icon" href="/favicon-48.png" sizes="48x48">
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: #f4f5f1; color: #1d2a26; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 30rem; margin: 2rem 1.25rem; text-align: center; }
+  .dot { width: 10px; height: 10px; margin: 0 auto 14px; border-radius: 50%; background: #0F6E56; animation: p 1s infinite alternate; }
+  @keyframes p { from { opacity: .25; } to { opacity: 1; } }
+  a { color: #0F6E56; }
+  .muted { color: #5d6b66; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="dot" id="dot"></div>
+  <p id="msg">Opening…</p>
+</main>
+<script>
+  // Short links: st-helens.ie/<name> isn't a page here, so GitHub Pages shows this page. It asks the
+  // Directors' Desk where <name> goes (the Links tab, managed on the Desk) and sends the browser there.
+  (function () {
+    var API = 'https://script.google.com/macros/s/AKfycbxMpG8lZSKSCUqW5OI-xt_-fuBHQB5WxW7gLrPqw2RhLGX5jVYYXwgRJmpaX4ClTPdPqg/exec';
+    var name = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, '').toLowerCase();
+    function notFound(text) {
+      document.getElementById('dot').hidden = true;
+      document.getElementById('msg').innerHTML = (text || 'There’s no page or link at this address.') +
+        '<br><span class="muted">Check the spelling, or go to <a href="/">st-helens.ie</a>.</span>';
+    }
+    if (!/^[a-z0-9][a-z0-9-]{0,59}$/.test(name)) { notFound(); return; }
+    fetch(API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                 body: JSON.stringify({ fn: 'resolveLink', args: [name] }) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.ok && res.result && /^https:\/\//.test(res.result)) location.replace(res.result);
+        else notFound('There’s no link called “' + name.replace(/[<>&"]/g, '') + '”.');
+      })
+      .catch(function () { notFound('The link couldn’t be looked up just now. Try again in a minute.'); });
+  })();
+</script>
+</body>
+</html>
